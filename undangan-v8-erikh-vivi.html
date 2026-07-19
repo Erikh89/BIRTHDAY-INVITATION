@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Erikh & Vivi — Birthday Bash!</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&family=Playfair+Display:ital,wght@1,700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+:root{
+  /* unified theme palette */
+  --bg-main:#f0f7ec;
+  --bg-card:#ffffff;
+  --bg-alt:#e8f3e0;
+  --bg-dark:#2d5a1e;
+  --g0:#0e2208;--g1:#1a3a0e;--g2:#2d5a1e;--g3:#4a8a2e;--g4:#6aaa4e;--g5:#8aca6e;--gleaf:#b8e898;
+  --brown0:#3a1a06;--brown1:#6b3a14;--brown2:#9a6030;--brown3:#c49060;--brown4:#ddb888;--brown5:#f0e0c0;
+  --sun:#ffe066;--amber:#d4900a;--cream:#f8f2e4;--white:#fffef8;--ink:#1a2a0e;
+  --teal:#2a7a4a;--lime:#7dce4a;
+}
+body{font-family:'Poppins',sans-serif;background:var(--bg-main);color:var(--ink);overflow-x:hidden;}
+
+/* ===================== LOADING SCREEN ===================== */
+#loader{
+  position:fixed;inset:0;z-index:99999;
+  background:linear-gradient(180deg,#0a1e06 0%,#1a3a0e 60%,#2d5a1e 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;
+  transition:opacity 0.6s ease;
+}
+#loader.done{opacity:0;pointer-events:none;}
+
+.loader-scene{
+  width:280px;height:120px;position:relative;overflow:hidden;
+}
+/* ground */
+.loader-ground{
+  position:absolute;bottom:0;left:0;right:0;height:28px;
+  background:linear-gradient(180deg,#3a8a2e,#2a6a1e);
+  border-radius:4px;
+}
+.loader-ground::before{
+  content:'';position:absolute;top:-8px;left:0;right:0;height:12px;
+  background:linear-gradient(180deg,transparent,#3a8a2e);
+  border-radius:50% 50% 0 0 / 100% 100% 0 0;
+  filter:blur(3px);
+}
+/* grass tufts */
+.grass-tuft{
+  position:absolute;bottom:26px;
+  width:12px;height:16px;
+  background:linear-gradient(180deg,#5aaa3e,#3a8a2e);
+  clip-path:polygon(50% 0%,100% 100%,0% 100%);
+}
+
+/* lion walking animation */
+.lion-walk{
+  position:absolute;bottom:24px;
+  animation:lionWalk 2.5s linear infinite;
+  font-size:52px;
+  line-height:1;
+  filter:drop-shadow(2px 4px 8px rgba(0,0,0,0.4));
+}
+@keyframes lionWalk{
+  0%{left:-70px;transform:scaleX(1);}
+  45%{left:calc(50% - 26px);transform:scaleX(1);}
+  50%{left:calc(50% - 26px);transform:scaleX(1) scaleY(1.04);}
+  55%{left:calc(50% - 26px);transform:scaleX(1) scaleY(0.98);}
+  100%{left:calc(100% + 20px);transform:scaleX(1);}
+}
+
+/* paw prints */
+.paw{
+  position:absolute;bottom:22px;
+  font-size:14px;opacity:0;
+  animation:pawAppear 2.5s linear infinite;
+}
+@keyframes pawAppear{0%,10%{opacity:0}20%{opacity:0.5}50%,100%{opacity:0}}
+
+.loader-text{
+  font-family:'Poppins',sans-serif;font-weight:800;
+  font-size:14px;letter-spacing:4px;text-transform:uppercase;
+  color:rgba(180,230,120,0.85);
+  animation:textPulse 1.5s ease-in-out infinite;
+}
+@keyframes textPulse{0%,100%{opacity:0.6}50%{opacity:1}}
+.loader-sub{
+  font-family:'Poppins',sans-serif;font-weight:600;
+  font-size:10px;letter-spacing:3px;text-transform:uppercase;
+  color:rgba(120,180,80,0.5);
+}
+
+/* ===================== SPLASH / ZOO GATE ===================== */
+#splash{
+  position:fixed;inset:0;z-index:9999;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  overflow:hidden;
+  background:linear-gradient(180deg,#6dd46e 0%,#4aaa3e 30%,#2d7a1e 60%,#1a5a0e 100%);
+  transition:opacity 0.7s ease,visibility 0.7s;
+}
+#splash.show{display:flex;}
+#splash.out{opacity:0;visibility:hidden;pointer-events:none;}
+
+/* sky behind gate */
+.gate-sky{
+  position:absolute;top:0;left:0;right:0;height:55%;
+  background:linear-gradient(180deg,#b8f0b0 0%,#8adc80 50%,#5aba4a 100%);
+  z-index:0;
+}
+/* clouds */
+.cloud{
+  position:absolute;border-radius:50px;
+  background:rgba(255,255,255,0.5);
+  filter:blur(2px);
+  animation:cloudDrift linear infinite;
+}
+@keyframes cloudDrift{0%{transform:translateX(-120%)}100%{transform:translateX(120vw)}}
+
+/* grass floor */
+.gate-grass{
+  position:absolute;bottom:0;left:0;right:0;
+  z-index:1;pointer-events:none;
+}
+
+/* ==== ZOO GATE SVG ==== */
+.zoo-gate-wrap{
+  position:relative;z-index:5;
+  width:min(88vw,360px);
+  cursor:pointer;
+  transition:transform 0.2s;
+  margin-top:-20px;
+  perspective:800px;
+}
+.zoo-gate-wrap:hover{transform:scale(1.015);}
+.zoo-gate-wrap:active{transform:scale(0.98);}
+
+/* gate posts */
+.gate-svg{width:100%;display:block;overflow:visible;}
+
+/* gate doors animation — proper hinge swing, hinge stays fixed at post */
+.gate-door-l{
+  transform-box:fill-box;
+  transform-origin:0% 50%;
+  transition:transform 1s cubic-bezier(0.65,0,0.35,1);
+}
+.gate-door-r{
+  transform-box:fill-box;
+  transform-origin:100% 50%;
+  transition:transform 1s cubic-bezier(0.65,0,0.35,1);
+}
+.gate-door-l.open{transform:rotateY(118deg);}
+.gate-door-r.open{transform:rotateY(-118deg);}
+
+/* animals around gate */
+.gate-animal{
+  position:absolute;z-index:6;
+  font-size:clamp(30px,7vw,48px);
+  filter:drop-shadow(2px 4px 8px rgba(0,0,0,0.3));
+  pointer-events:none;
+}
+.ga-elephant{bottom:28%;left:-8%;animation:gaPeekL 4s ease-in-out infinite;}
+.ga-zebra{bottom:26%;right:-8%;animation:gaPeekR 3.5s ease-in-out infinite 0.5s;}
+.ga-giraffe{bottom:40%;right:-5%;font-size:clamp(36px,8vw,56px);animation:gaPeekR 5s ease-in-out infinite 1s;}
+.ga-croc{bottom:14%;left:5%;font-size:clamp(22px,5vw,34px);animation:gaPeekL 6s ease-in-out infinite 0.8s;}
+.ga-butterfly{top:10%;right:12%;font-size:clamp(20px,4vw,30px);animation:flutter3 3s ease-in-out infinite;}
+@keyframes gaPeekL{0%,100%{transform:translateX(-30%)}50%{transform:translateX(0)}}
+@keyframes gaPeekR{0%,100%{transform:translateX(30%)}50%{transform:translateX(0)}}
+@keyframes flutter3{0%,100%{transform:rotate(-8deg) translateY(0)}50%{transform:rotate(8deg) translateY(-8px)}}
+
+/* tap hint */
+.gate-tap{
+  position:absolute;bottom:-38px;left:50%;transform:translateX(-50%);
+  font-family:'Poppins',sans-serif;font-weight:700;
+  font-size:10px;letter-spacing:4px;text-transform:uppercase;
+  color:rgba(255,255,255,0.7);white-space:nowrap;
+  animation:tapBlink 2s ease-in-out infinite;
+}
+@keyframes tapBlink{0%,100%{opacity:0.7}50%{opacity:0.2}}
+
+/* STATEMENT below gate */
+.gate-statement{
+  position:relative;z-index:5;
+  font-family:'Poppins',sans-serif;font-weight:900;
+  font-size:clamp(16px,4.5vw,24px);
+  color:rgba(255,255,255,0.95);
+  letter-spacing:3px;text-align:center;
+  margin-top:52px;
+  text-shadow:0 2px 12px rgba(0,0,0,0.35);
+}
+
+/* ===================== MAIN ===================== */
+#main{display:none;opacity:0;transition:opacity 0.8s;}
+#main.visible{opacity:1;}
+
+/* ===================== HERO ===================== */
+.hero{
+  min-height:100vh;position:relative;overflow:hidden;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:80px 20px 130px;
+  background:linear-gradient(180deg,#2a6a1e 0%,#3a8a2a 25%,#4aaa3a 50%,#3a8a2a 75%,#1a5a0e 100%);
+}
+.hero-glow{
+  position:absolute;top:8%;left:50%;transform:translateX(-50%);
+  width:min(65vw,320px);height:min(65vw,320px);
+  background:radial-gradient(circle,rgba(220,255,120,0.38) 0%,rgba(160,230,80,0.14) 40%,transparent 70%);
+  border-radius:50%;pointer-events:none;z-index:1;
+  animation:glowP 5s ease-in-out infinite;
+}
+@keyframes glowP{0%,100%{opacity:0.8;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.08)}}
+.light-spot{position:absolute;border-radius:50%;pointer-events:none;z-index:1;background:radial-gradient(circle,rgba(200,255,100,0.14),transparent);filter:blur(22px);animation:dapple2 8s ease-in-out infinite;}
+@keyframes dapple2{0%,100%{opacity:0.5;transform:scale(1)}50%{opacity:1;transform:scale(1.12)}}
+.vine{position:absolute;top:0;width:3px;border-radius:3px;background:linear-gradient(180deg,#0a2a0a,#1a5a1a,#2a8a2a,#1a5a1a);pointer-events:none;z-index:2;animation:swingV2 5s ease-in-out infinite;transform-origin:top center;}
+.vine::after{content:'🍃';position:absolute;bottom:-4px;left:-10px;font-size:22px;}
+@keyframes swingV2{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg)}}
+.hero-animal{position:absolute;z-index:3;pointer-events:none;filter:drop-shadow(2px 4px 10px rgba(0,0,0,0.35));}
+.ha-giraffe{font-size:clamp(50px,11vw,84px);right:1%;bottom:24%;animation:sawY 5s ease-in-out infinite;}
+.ha-elephant{font-size:clamp(46px,10vw,76px);left:-1%;bottom:21%;animation:sawY 6.5s ease-in-out infinite 1s;}
+.ha-monkey{font-size:clamp(30px,6vw,50px);right:8%;top:18%;animation:swingY 3.5s ease-in-out infinite;}
+.ha-toucan{font-size:clamp(26px,5.5vw,42px);left:5%;top:16%;animation:swingY 4.5s ease-in-out infinite 0.6s;}
+.ha-tiger{font-size:clamp(34px,7vw,56px);left:2%;bottom:34%;animation:sawY 4s ease-in-out infinite 2s;}
+.ha-croc{font-size:clamp(26px,5vw,40px);right:4%;bottom:37%;animation:sawY 7s ease-in-out infinite 1.5s;}
+@keyframes sawY{0%,100%{transform:rotate(-4deg) translateY(0)}50%{transform:rotate(4deg) translateY(-5px)}}
+@keyframes swingY{0%,100%{transform:rotate(-9deg) translateY(0)}50%{transform:rotate(9deg) translateY(-10px)}}
+.hero-content{position:relative;z-index:5;}
+.hero-tag{display:inline-block;font-family:'Poppins',sans-serif;font-weight:700;font-size:clamp(12px,2.8vw,16px);letter-spacing:3px;color:var(--ink);background:rgba(255,255,255,0.92);padding:10px 28px;border-radius:100px;margin-bottom:28px;box-shadow:0 4px 20px rgba(0,0,0,0.15);}
+.hero-names{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(58px,17vw,115px);line-height:0.92;color:var(--white);text-shadow:0 4px 0 rgba(0,0,0,0.2),0 8px 30px rgba(0,0,0,0.25);letter-spacing:-2px;}
+.hero-amp{font-family:'Playfair Display',serif;font-weight:700;font-style:italic;font-size:0.52em;color:var(--sun);display:block;text-shadow:0 3px 0 rgba(0,0,0,0.2),0 0 30px rgba(255,224,80,0.4);letter-spacing:0;}
+.hero-floor{position:absolute;bottom:0;left:0;width:100%;z-index:4;pointer-events:none;}
+.hero-top-svg{position:absolute;top:0;left:0;width:100%;z-index:4;pointer-events:none;}
+.scroll-hint{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);font-family:'Poppins',sans-serif;font-weight:600;font-size:9px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,0.4);z-index:5;animation:bncH 2s ease-in-out infinite;}
+@keyframes bncH{0%,100%{transform:translateX(-50%) translateY(0)}50%{transform:translateX(-50%) translateY(7px)}}
+
+/* ===================== UNIFIED CONTINUOUS BG ===================== */
+/* Single wrapper holds one long gradient behind ALL content sections,
+   so there are no hard seams between blocks anymore. */
+#content-flow{
+  position:relative;
+  background:linear-gradient(180deg,
+    #f0f7ec 0%,
+    #f8f2e4 16%,
+    #f3ead6 32%,
+    #f0e0c0 48%,
+    #ece2c8 58%,
+    #e8f3e0 72%,
+    #eef7e6 84%,
+    #f0f7ec 100%
+  );
+}
+.s1,.s2,.s3,.s4{background:transparent;}
+
+/* flowing divider between sections — now purely decorative, no color break */
+.wave-div{display:none;}
+
+.sec-wrap{padding:56px 20px;max-width:700px;margin:0 auto;}
+.sec-eyebrow{font-family:'Poppins',sans-serif;font-weight:700;font-size:10px;letter-spacing:5px;text-transform:uppercase;color:var(--teal);text-align:center;margin-bottom:8px;}
+.sec-title{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(22px,6vw,36px);color:var(--ink);text-align:center;margin-bottom:6px;line-height:1.1;}
+.sec-divider{width:56px;height:4px;background:var(--lime);border-radius:10px;margin:0 auto 32px;}
+
+/* ===================== WILDCARD CARDS ===================== */
+.wildcard-card{background:var(--white);border-radius:24px;border:3px solid var(--g3);overflow:hidden;box-shadow:0 8px 0 var(--g2),0 14px 36px rgba(0,0,0,0.1);margin-bottom:22px;}
+.wildcard-card:last-child{margin-bottom:0;}
+.wildcard-card.vivi-card{border-color:var(--brown2);box-shadow:0 8px 0 var(--brown1),0 14px 36px rgba(0,0,0,0.1);}
+.wc-inner{display:grid;grid-template-columns:1fr 1fr;min-height:270px;}
+.wc-photo{position:relative;overflow:hidden;background:linear-gradient(145deg,#c8e8b8,#98c888);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:0;min-height:200px;}
+.vivi-card .wc-photo{background:linear-gradient(145deg,#e8d8a8,#c8a868);}
+.wc-photo img{width:100%;height:100%;object-fit:cover;display:none;position:absolute;inset:0;}
+.wc-photo img.loaded{display:block;}
+.wc-photo-placeholder{font-size:48px;opacity:0.45;}
+.wc-photo img.loaded ~ .wc-photo-placeholder,.wc-photo img.loaded ~ .wc-photo-hint{display:none;}
+.wc-photo-hint{font-family:'Poppins',sans-serif;font-weight:600;font-size:10px;color:rgba(0,0,0,0.28);letter-spacing:1px;text-align:center;padding:0 14px;line-height:1.5;}
+.wc-badge{position:absolute;top:12px;left:12px;background:rgba(0,0,0,0.5);backdrop-filter:blur(6px);border-radius:8px;padding:4px 10px;font-family:'Poppins',sans-serif;font-weight:700;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.9);}
+.wc-animal{position:absolute;bottom:10px;right:10px;font-size:38px;animation:wob3 3.5s ease-in-out infinite;filter:drop-shadow(2px 3px 8px rgba(0,0,0,0.2));}
+@keyframes wob3{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.1)}}
+.wc-info{padding:22px 18px;display:flex;flex-direction:column;justify-content:center;border-left:2px dashed rgba(0,0,0,0.06);}
+.wc-name{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(22px,5vw,30px);line-height:1;margin-bottom:14px;}
+.wildcard-card:not(.vivi-card) .wc-name{color:var(--g2);}
+.vivi-card .wc-name{color:var(--brown1);}
+.wc-row{display:flex;align-items:flex-start;gap:6px;padding:5px 0;border-bottom:1px dashed rgba(0,0,0,0.07);}
+.wc-row:last-of-type{border-bottom:none;}
+.wc-k{font-family:'Poppins',sans-serif;font-weight:700;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:#bbb;flex-shrink:0;width:60px;padding-top:2px;}
+.wc-v{font-family:'Poppins',sans-serif;font-weight:700;font-size:11px;color:var(--ink);line-height:1.35;}
+.wc-motto{margin-top:12px;padding-top:11px;border-top:2px dashed rgba(0,0,0,0.07);font-family:'Poppins',sans-serif;font-weight:400;font-size:10px;font-style:italic;color:#999;line-height:1.6;}
+
+/* ===== GORILLA ILLUSTRATIONS ===== */
+.gorilla-wrap{width:120px;height:130px;position:relative;}
+.gorilla-svg{width:100%;height:100%;display:block;}
+.wc-fact-row{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px dashed rgba(0,0,0,0.07);}
+.wc-fact-row:last-of-type{border-bottom:none;}
+.wc-fact-icon{font-size:14px;flex-shrink:0;width:20px;text-align:center;padding-top:1px;}
+.wc-fact-label{font-family:'Poppins',sans-serif;font-weight:700;font-size:8px;letter-spacing:1px;text-transform:uppercase;color:#bbb;display:block;margin-bottom:1px;}
+.wc-fact-val{font-family:'Poppins',sans-serif;font-weight:700;font-size:11px;color:var(--ink);line-height:1.35;}
+
+/* ===================== COUNTDOWN ===================== */
+.cd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-width:420px;margin:0 auto;}
+.cd-box{background:var(--white);border-radius:16px;border:3px solid var(--g4);padding:16px 8px;text-align:center;box-shadow:0 4px 0 var(--g3),0 6px 16px rgba(0,0,0,0.08);}
+.cd-num{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(26px,7vw,38px);color:var(--g2);display:block;line-height:1;}
+.cd-lbl{font-family:'Poppins',sans-serif;font-weight:700;font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#aaa;margin-top:4px;}
+
+/* ===================== DETAILS ===================== */
+.details-card{background:var(--white);border-radius:20px;border:3px solid var(--g3);overflow:hidden;box-shadow:0 6px 0 var(--g2),0 10px 24px rgba(0,0,0,0.08);}
+.details-header{background:linear-gradient(135deg,var(--g1),var(--g3));padding:16px 24px;display:flex;align-items:center;gap:12px;}
+.details-h-title{font-family:'Poppins',sans-serif;font-weight:800;font-size:18px;color:var(--white);}
+.detail-rows{padding:8px 0;}
+.detail-row{display:flex;align-items:flex-start;gap:16px;padding:16px 24px;border-bottom:1px dashed rgba(0,0,0,0.08);}
+.detail-row:last-child{border:none;}
+.detail-icon{font-size:22px;flex-shrink:0;width:44px;height:44px;background:linear-gradient(135deg,#e8f5e0,#c8e8b0);border:2px solid var(--g4);border-radius:12px;display:flex;align-items:center;justify-content:center;}
+.detail-k{font-family:'Poppins',sans-serif;font-weight:700;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:3px;}
+.detail-v{font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;color:var(--ink);}
+.detail-sub{font-size:11px;color:#999;margin-top:2px;}
+.detail-stamp{float:right;width:58px;height:58px;border:3px solid rgba(212,144,10,0.45);border-radius:6px;display:flex;flex-direction:column;align-items:center;justify-content:center;transform:rotate(10deg);background:rgba(255,235,150,0.2);}
+.stamp-mo{font-family:'Poppins',sans-serif;font-weight:800;font-size:8px;letter-spacing:2px;color:var(--amber);}
+.stamp-d{font-family:'Poppins',sans-serif;font-weight:900;font-size:22px;color:var(--amber);line-height:1;}
+.stamp-yr{font-family:'Poppins',sans-serif;font-weight:700;font-size:8px;color:var(--amber);}
+
+/* ===================== DRESSCODE ===================== */
+.dc-wrap{background:var(--white);border-radius:24px;border:3px solid var(--g3);overflow:hidden;box-shadow:0 6px 0 var(--g2),0 10px 24px rgba(0,0,0,0.08);}
+.dc-header{background:linear-gradient(135deg,var(--g1),var(--g2));padding:22px 24px;text-align:center;}
+.dc-header-title{font-family:'Poppins',sans-serif;font-weight:900;font-size:20px;color:var(--white);margin-bottom:4px;}
+.dc-header-sub{font-family:'Poppins',sans-serif;font-weight:600;font-size:11px;color:var(--gleaf);letter-spacing:3px;text-transform:uppercase;}
+.dc-body{padding:28px 24px;}
+.dc-theme-desc{font-family:'Poppins',sans-serif;font-size:12px;color:#888;line-height:1.8;text-align:center;margin-bottom:24px;}
+.dc-palette-section{margin-bottom:22px;}
+.dc-palette-label{font-family:'Poppins',sans-serif;font-weight:800;font-size:10px;letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.dc-palette-label.vivi-lbl{color:var(--brown1);}
+.dc-palette-label.erikh-lbl{color:var(--g2);}
+.dc-palette-strip{display:flex;border-radius:14px;overflow:hidden;height:52px;box-shadow:0 4px 14px rgba(0,0,0,0.12);}
+.dc-sw{flex:1;display:flex;align-items:flex-end;justify-content:center;padding-bottom:5px;}
+.dc-sw span{font-family:'Poppins',sans-serif;font-weight:700;font-size:6.5px;color:rgba(255,255,255,0.78);letter-spacing:0.3px;text-shadow:0 1px 2px rgba(0,0,0,0.5);}
+.dc-split{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:20px;}
+.dc-who-card{border-radius:18px;padding:20px 16px;text-align:center;border:2px solid;}
+.dc-who-card.vivi-who{background:linear-gradient(160deg,#f8f0e0,#eedcc0);border-color:rgba(154,96,48,0.25);}
+.dc-who-card.erikh-who{background:linear-gradient(160deg,#eaf6e2,#cceabc);border-color:rgba(45,90,30,0.25);}
+.dc-who-name{font-family:'Poppins',sans-serif;font-weight:800;font-size:13px;margin-bottom:10px;}
+.dc-who-card.vivi-who .dc-who-name{color:var(--brown1);}
+.dc-who-card.erikh-who .dc-who-name{color:var(--g2);}
+.dc-dots{display:flex;gap:5px;justify-content:center;margin-bottom:10px;}
+.dc-dot{width:18px;height:18px;border-radius:50%;border:2px solid rgba(0,0,0,0.08);box-shadow:0 2px 4px rgba(0,0,0,0.1);}
+.dc-who-desc{font-family:'Poppins',sans-serif;font-size:10px;font-weight:600;color:#888;line-height:1.6;}
+.dc-note{text-align:center;font-family:'Poppins',sans-serif;font-size:11px;color:#aaa;font-style:italic;margin-top:18px;padding-top:14px;border-top:1px dashed #ddeedd;}
+
+/* ===================== KESAN PESAN ===================== */
+.kesan-card{background:var(--white);border-radius:20px;border:3px solid var(--g3);padding:36px 28px;box-shadow:0 6px 0 var(--g3),0 10px 24px rgba(0,0,0,0.08);}
+.for-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;}
+.for-btn{padding:14px;border-radius:14px;border:2.5px solid;background:transparent;cursor:pointer;font-family:'Poppins',sans-serif;font-weight:800;font-size:13px;letter-spacing:1px;transition:all 0.2s;display:flex;align-items:center;justify-content:center;gap:8px;}
+.for-btn.lion{border-color:var(--g3);color:var(--g2);}
+.for-btn.butterfly{border-color:var(--brown2);color:var(--brown1);}
+.for-btn.lion.active,.for-btn.lion:hover{background:linear-gradient(135deg,#eaf6e2,#cceabc);border-color:var(--g2);transform:scale(1.02);}
+.for-btn.butterfly.active,.for-btn.butterfly:hover{background:linear-gradient(135deg,#f8f0e0,#eedcc0);border-color:var(--brown1);transform:scale(1.02);}
+.form-grp{margin-bottom:18px;}
+.form-lbl{display:block;font-family:'Poppins',sans-serif;font-weight:700;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:8px;}
+.form-inp{width:100%;background:#f4fbf0;border:2px solid #cceabc;border-radius:12px;padding:12px 16px;color:var(--ink);font-family:'Poppins',sans-serif;font-size:14px;font-weight:600;outline:none;transition:border-color 0.2s;}
+.form-inp:focus{border-color:var(--g3);}
+.form-inp::placeholder{color:#bbb;font-weight:400;}
+.send-btn{width:100%;padding:16px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--g2),var(--g3));color:var(--white);font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;letter-spacing:1px;cursor:pointer;transition:all 0.2s;margin-top:4px;box-shadow:0 4px 0 var(--g1),0 6px 16px rgba(0,0,0,0.12);}
+.send-btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 var(--g1);}
+.send-btn:active{transform:translateY(2px);box-shadow:0 2px 0 var(--g1);}
+.send-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.ok-box{display:none;padding:16px;text-align:center;border-radius:12px;background:#eaf6e2;border:2px solid var(--g4);color:var(--g2);font-family:'Poppins',sans-serif;font-weight:700;font-size:13px;margin-top:14px;}
+
+/* ===================== WALL ===================== */
+.msg-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:8px;}
+.msg-leaf{border-radius:16px 16px 16px 4px;padding:16px;border:2px solid;background:var(--white);}
+.msg-leaf.for-erikh{border-color:var(--g4);background:linear-gradient(135deg,#eef8e8,#ddf0d0);}
+.msg-leaf.for-vivi{border-color:var(--brown3);background:linear-gradient(135deg,#fdf6e8,#f5e8cc);border-radius:16px 16px 4px 16px;}
+.msg-tag{font-family:'Poppins',sans-serif;font-weight:800;font-size:9px;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px;display:flex;align-items:center;gap:4px;}
+.msg-leaf.for-erikh .msg-tag{color:var(--g2);}
+.msg-leaf.for-vivi .msg-tag{color:var(--brown1);}
+.msg-txt{font-family:'Poppins',sans-serif;font-weight:600;font-size:12px;color:var(--ink);line-height:1.6;font-style:italic;}
+.msg-time{font-size:9px;color:#ccc;margin-top:8px;}
+.msg-empty{grid-column:span 2;text-align:center;padding:40px;color:#bbb;font-family:'Poppins',sans-serif;font-size:13px;font-style:italic;}
+.refresh-btn{display:block;margin:16px auto 0;padding:10px 24px;border-radius:100px;background:transparent;border:2px solid #cceabc;font-family:'Poppins',sans-serif;font-weight:700;font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--teal);cursor:pointer;transition:all 0.2s;}
+.refresh-btn:hover{background:#eaf6e2;border-color:var(--g4);}
+
+/* ===================== RSVP ===================== */
+.ticket{border-radius:20px;overflow:hidden;border:3px solid var(--g2);box-shadow:0 6px 0 var(--g1),0 10px 24px rgba(0,0,0,0.1);}
+.ticket-top{background:linear-gradient(135deg,var(--g1),var(--g2));padding:24px 28px;display:flex;justify-content:space-between;align-items:center;}
+.ticket-admit{font-family:'Poppins',sans-serif;font-weight:700;font-size:8px;letter-spacing:4px;text-transform:uppercase;color:var(--gleaf);margin-bottom:4px;}
+.ticket-title{font-family:'Poppins',sans-serif;font-weight:900;font-size:22px;color:var(--white);}
+.ticket-right{font-size:36px;}
+.perf{display:flex;align-items:center;padding:0 12px;background:var(--white);}
+.perf-hole{width:20px;height:20px;border-radius:50%;background:var(--brown5);flex-shrink:0;}
+.perf-dash{flex:1;border-top:3px dashed rgba(45,90,30,0.15);}
+.ticket-body{background:var(--white);padding:28px;}
+.ticket-note{font-family:'Poppins',sans-serif;font-size:12px;color:#999;margin-bottom:22px;line-height:1.8;}
+.t-grp{margin-bottom:18px;}
+.t-lbl{display:block;font-family:'Poppins',sans-serif;font-weight:700;font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--teal);margin-bottom:8px;}
+.t-inp{width:100%;background:#f4fbf0;border:2px solid #cceabc;border-radius:12px;padding:12px 16px;color:var(--ink);font-family:'Poppins',sans-serif;font-size:15px;font-weight:700;outline:none;transition:border-color 0.2s;}
+.t-inp:focus{border-color:var(--g3);}
+.t-inp::placeholder{color:#ccc;font-weight:400;}
+.attend-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.att-btn{padding:14px;border-radius:12px;border:2.5px solid;background:transparent;cursor:pointer;font-family:'Poppins',sans-serif;font-weight:800;font-size:13px;letter-spacing:1px;transition:all 0.2s;}
+.att-btn.yes{border-color:#aadaaa;color:var(--g2);}
+.att-btn.no{border-color:#ddc8a8;color:var(--brown2);}
+.att-btn.yes.active,.att-btn.yes:hover{background:linear-gradient(135deg,#eaf6e2,#cceabc);border-color:var(--g3);transform:scale(1.02);}
+.att-btn.no.active,.att-btn.no:hover{background:linear-gradient(135deg,#f8f0e0,#eedcc0);border-color:var(--brown2);transform:scale(1.02);}
+.t-submit{width:100%;padding:16px;border-radius:14px;border:none;background:linear-gradient(135deg,var(--g1),var(--g2));color:var(--white);font-family:'Poppins',sans-serif;font-weight:800;font-size:14px;letter-spacing:1px;cursor:pointer;transition:all 0.2s;margin-top:16px;box-shadow:0 4px 0 var(--g0),0 6px 16px rgba(0,0,0,0.12);}
+.t-submit:hover{transform:translateY(-2px);}
+.t-submit:active{transform:translateY(2px);}
+.t-submit:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+.t-ok{display:none;padding:16px;text-align:center;border-radius:12px;background:#eaf6e2;border:2px solid var(--g4);color:var(--g2);font-family:'Poppins',sans-serif;font-weight:700;font-size:13px;margin-top:14px;}
+
+/* ===================== FOOTER ===================== */
+.footer{text-align:center;padding:50px 20px 60px;background:linear-gradient(180deg,var(--g1),var(--g0));}
+.footer-animals{font-size:26px;letter-spacing:6px;margin-bottom:14px;}
+.footer-title{font-family:'Poppins',sans-serif;font-weight:900;font-size:clamp(20px,5vw,30px);color:var(--white);margin-bottom:6px;}
+.footer-sub{font-family:'Poppins',sans-serif;font-weight:600;font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--gleaf);opacity:0.6;}
+
+.music-fab{position:fixed;bottom:20px;right:16px;z-index:200;width:48px;height:48px;border-radius:50%;background:var(--g2);border:2.5px solid var(--g4);display:none;align-items:center;justify-content:center;font-size:20px;cursor:pointer;box-shadow:0 4px 0 var(--g1),0 6px 20px rgba(0,0,0,0.25);}
+.music-fab.show{display:flex;}
+
+.reveal{opacity:0;transform:translateY(20px);transition:opacity 0.55s,transform 0.55s;}
+.reveal.in{opacity:1;transform:none;}
+
+@media(max-width:500px){
+  .wc-inner{grid-template-columns:1fr;}
+  .wc-photo{min-height:200px;}
+  .dc-split,.msg-grid,.for-grid,.attend-btns{grid-template-columns:1fr;}
+  .kesan-card,.ticket-body,.dc-body{padding:22px 16px;}
+  .sec-wrap{padding:44px 16px;}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== LOADING SCREEN ===================== -->
+<div id="loader">
+  <div class="loader-scene">
+    <!-- grass tufts -->
+    <div class="grass-tuft" style="left:10px;"></div>
+    <div class="grass-tuft" style="left:40px;height:12px;"></div>
+    <div class="grass-tuft" style="left:80px;height:18px;"></div>
+    <div class="grass-tuft" style="left:140px;height:14px;"></div>
+    <div class="grass-tuft" style="left:200px;"></div>
+    <div class="grass-tuft" style="left:240px;height:12px;"></div>
+    <div class="loader-ground"></div>
+    <!-- paw prints trailing -->
+    <span class="paw" style="left:20%;animation-delay:0.3s;">🐾</span>
+    <span class="paw" style="left:38%;animation-delay:0.6s;">🐾</span>
+    <span class="paw" style="left:55%;animation-delay:0.9s;">🐾</span>
+    <!-- walking lion -->
+    <div class="lion-walk">🦁</div>
+  </div>
+  <div class="loader-text">Loading...</div>
+  <div class="loader-sub">Preparing the jungle</div>
+</div>
+
+<!-- ===================== SPLASH / ZOO GATE ===================== -->
+<div id="splash">
+  <div class="gate-sky"></div>
+
+  <!-- clouds -->
+  <div class="cloud" style="width:120px;height:30px;top:6%;left:-10%;animation-duration:25s;animation-delay:0s;"></div>
+  <div class="cloud" style="width:80px;height:22px;top:12%;left:-10%;animation-duration:32s;animation-delay:8s;opacity:0.35;"></div>
+  <div class="cloud" style="width:100px;height:26px;top:4%;left:-10%;animation-duration:20s;animation-delay:14s;"></div>
+
+  <!-- animals around gate -->
+  <span class="gate-animal ga-elephant">🐘</span>
+  <span class="gate-animal ga-zebra">🦓</span>
+  <span class="gate-animal ga-giraffe">🦒</span>
+  <span class="gate-animal ga-croc">🐊</span>
+  <span class="gate-animal ga-butterfly">🦋</span>
+
+  <!-- ZOO GATE -->
+  <div class="zoo-gate-wrap" id="gateWrap" onclick="openGate()">
+    <svg class="gate-svg" viewBox="0 0 360 280" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <!-- stone texture gradient for posts -->
+        <linearGradient id="postGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#8B6914"/>
+          <stop offset="30%" style="stop-color:#C49A2A"/>
+          <stop offset="60%" style="stop-color:#A07818"/>
+          <stop offset="100%" style="stop-color:#7A5610"/>
+        </linearGradient>
+        <linearGradient id="archGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#D4A830"/>
+          <stop offset="50%" style="stop-color:#B8881A"/>
+          <stop offset="100%" style="stop-color:#8B6614"/>
+        </linearGradient>
+        <linearGradient id="doorGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" style="stop-color:#5A8A3A"/>
+          <stop offset="40%" style="stop-color:#4A7A2A"/>
+          <stop offset="100%" style="stop-color:#3A6A1A"/>
+        </linearGradient>
+        <linearGradient id="signGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#E8A830"/>
+          <stop offset="100%" style="stop-color:#C48018"/>
+        </linearGradient>
+        <!-- stone block pattern -->
+        <pattern id="stones" x="0" y="0" width="24" height="18" patternUnits="userSpaceOnUse">
+          <rect width="24" height="18" fill="none"/>
+          <rect x="1" y="1" width="22" height="8" rx="1" fill="rgba(255,255,255,0.06)"/>
+          <rect x="1" y="10" width="11" height="7" rx="1" fill="rgba(255,255,255,0.04)"/>
+          <rect x="13" y="10" width="10" height="7" rx="1" fill="rgba(0,0,0,0.04)"/>
+        </pattern>
+      </defs>
+
+      <!-- GROUND -->
+      <rect x="0" y="250" width="360" height="30" fill="#5aaa3a" rx="4"/>
+      <rect x="0" y="242" width="360" height="12" fill="#4a9a2a" rx="6"/>
+
+      <!-- PATH through gate -->
+      <ellipse cx="180" cy="260" rx="60" ry="14" fill="#8aba60" opacity="0.5"/>
+
+      <!-- BUSHES -->
+      <ellipse cx="30" cy="248" rx="38" ry="22" fill="#3a8a2a"/>
+      <ellipse cx="18" cy="240" rx="24" ry="18" fill="#4aaa3a"/>
+      <ellipse cx="45" cy="242" rx="22" ry="16" fill="#5aca4a" opacity="0.8"/>
+      <ellipse cx="330" cy="248" rx="38" ry="22" fill="#3a8a2a"/>
+      <ellipse cx="342" cy="240" rx="24" ry="18" fill="#4aaa3a"/>
+      <ellipse cx="315" cy="242" rx="22" ry="16" fill="#5aca4a" opacity="0.8"/>
+
+      <!-- flowers in bushes -->
+      <circle cx="22" cy="234" r="5" fill="#ff88aa"/>
+      <circle cx="22" cy="234" r="2" fill="#ffeeaa"/>
+      <circle cx="48" cy="237" r="4" fill="#ffaa44"/>
+      <circle cx="48" cy="237" r="1.5" fill="#ffeeaa"/>
+      <circle cx="338" cy="234" r="5" fill="#ff88aa"/>
+      <circle cx="338" cy="234" r="2" fill="#ffeeaa"/>
+      <circle cx="316" cy="237" r="4" fill="#ffaa44"/>
+
+      <!-- LEFT POST (stone) -->
+      <rect x="42" y="60" width="52" height="190" rx="4" fill="url(#postGrad)"/>
+      <rect x="42" y="60" width="52" height="190" rx="4" fill="url(#stones)" opacity="0.5"/>
+      <!-- post cap -->
+      <rect x="36" y="54" width="64" height="14" rx="4" fill="#C49A2A"/>
+      <rect x="38" y="50" width="60" height="8" rx="3" fill="#D4AA30"/>
+      <!-- sphere on top -->
+      <circle cx="68" cy="44" r="16" fill="url(#archGrad)"/>
+      <circle cx="63" cy="38" r="5" fill="rgba(255,255,255,0.2)"/>
+
+      <!-- RIGHT POST (stone) -->
+      <rect x="266" y="60" width="52" height="190" rx="4" fill="url(#postGrad)"/>
+      <rect x="266" y="60" width="52" height="190" rx="4" fill="url(#stones)" opacity="0.5"/>
+      <rect x="260" y="54" width="64" height="14" rx="4" fill="#C49A2A"/>
+      <rect x="262" y="50" width="60" height="8" rx="3" fill="#D4AA30"/>
+      <circle cx="292" cy="44" r="16" fill="url(#archGrad)"/>
+      <circle cx="287" cy="38" r="5" fill="rgba(255,255,255,0.2)"/>
+
+      <!-- ARCH BEAM connecting posts -->
+      <path d="M42,78 Q180,20 318,78" stroke="url(#archGrad)" stroke-width="22" fill="none" stroke-linecap="round"/>
+      <path d="M42,78 Q180,20 318,78" stroke="rgba(255,255,255,0.12)" stroke-width="6" fill="none" stroke-linecap="round"/>
+
+      <!-- PALM TREE left side -->
+      <rect x="10" y="100" width="10" height="120" rx="5" fill="#8B5E1A" transform="rotate(-5,15,160)"/>
+      <ellipse cx="8" cy="96" rx="28" ry="14" fill="#2a8a1a" transform="rotate(-30,8,96)"/>
+      <ellipse cx="18" cy="90" rx="26" ry="13" fill="#3aaa2a" transform="rotate(15,18,90)"/>
+      <ellipse cx="4" cy="85" rx="22" ry="11" fill="#2a9a1a" transform="rotate(-50,4,85)"/>
+
+      <!-- PALM TREE right side -->
+      <rect x="340" y="100" width="10" height="120" rx="5" fill="#8B5E1A" transform="rotate(5,345,160)"/>
+      <ellipse cx="352" cy="96" rx="28" ry="14" fill="#2a8a1a" transform="rotate(30,352,96)"/>
+      <ellipse cx="342" cy="90" rx="26" ry="13" fill="#3aaa2a" transform="rotate(-15,342,90)"/>
+      <ellipse cx="356" cy="85" rx="22" ry="11" fill="#2a9a1a" transform="rotate(50,356,85)"/>
+
+      <!-- GATE DOORS -->
+      <g class="gate-door-l" id="doorL">
+        <!-- left door panel -->
+        <rect x="94" y="90" width="86" height="158" rx="3" fill="url(#doorGrad)"/>
+        <!-- door planks -->
+        <rect x="100" y="100" width="74" height="8" rx="2" fill="rgba(255,255,255,0.1)"/>
+        <rect x="100" y="120" width="74" height="8" rx="2" fill="rgba(255,255,255,0.08)"/>
+        <rect x="100" y="140" width="74" height="8" rx="2" fill="rgba(255,255,255,0.1)"/>
+        <rect x="100" y="160" width="74" height="8" rx="2" fill="rgba(255,255,255,0.08)"/>
+        <rect x="100" y="180" width="74" height="8" rx="2" fill="rgba(255,255,255,0.1)"/>
+        <rect x="100" y="200" width="74" height="8" rx="2" fill="rgba(255,255,255,0.08)"/>
+        <rect x="100" y="220" width="74" height="8" rx="2" fill="rgba(255,255,255,0.06)"/>
+        <!-- horizontal bars -->
+        <rect x="94" y="108" width="86" height="10" rx="2" fill="#3A6A1A"/>
+        <rect x="94" y="170" width="86" height="10" rx="2" fill="#3A6A1A"/>
+        <rect x="94" y="232" width="86" height="10" rx="2" fill="#3A6A1A"/>
+        <!-- knob -->
+        <circle cx="174" cy="170" r="7" fill="#C49A2A"/>
+        <circle cx="172" cy="168" r="2.5" fill="rgba(255,255,255,0.3)"/>
+      </g>
+
+      <g class="gate-door-r" id="doorR">
+        <!-- right door panel -->
+        <rect x="180" y="90" width="86" height="158" rx="3" fill="url(#doorGrad)"/>
+        <rect x="186" y="100" width="74" height="8" rx="2" fill="rgba(255,255,255,0.1)"/>
+        <rect x="186" y="120" width="74" height="8" rx="2" fill="rgba(255,255,255,0.08)"/>
+        <rect x="186" y="140" width="74" height="8" rx="2" fill="rgba(255,255,255,0.1)"/>
+        <rect x="186" y="160" width="74" height="8" rx="2" fill="rgba(255,255,255,0.08)"/>
+        <rect x="186" y="180" width="74" height="8" rx="2" fill="rgba(255,255,255,0.1)"/>
+        <rect x="186" y="200" width="74" height="8" rx="2" fill="rgba(255,255,255,0.08)"/>
+        <rect x="186" y="220" width="74" height="8" rx="2" fill="rgba(255,255,255,0.06)"/>
+        <rect x="180" y="108" width="86" height="10" rx="2" fill="#3A6A1A"/>
+        <rect x="180" y="170" width="86" height="10" rx="2" fill="#3A6A1A"/>
+        <rect x="180" y="232" width="86" height="10" rx="2" fill="#3A6A1A"/>
+        <circle cx="186" cy="170" r="7" fill="#C49A2A"/>
+        <circle cx="184" cy="168" r="2.5" fill="rgba(255,255,255,0.3)"/>
+      </g>
+
+      <!-- ZOO SIGN (on arch) -->
+      <!-- sign backing wood -->
+      <rect x="112" y="26" width="136" height="44" rx="10" fill="url(#signGrad)"/>
+      <rect x="115" y="29" width="130" height="38" rx="8" fill="#D4901A"/>
+      <!-- wood grain -->
+      <line x1="120" y1="32" x2="120" y2="62" stroke="rgba(0,0,0,0.06)" stroke-width="1.5"/>
+      <line x1="132" y1="32" x2="132" y2="62" stroke="rgba(0,0,0,0.05)" stroke-width="1"/>
+      <line x1="228" y1="32" x2="228" y2="62" stroke="rgba(0,0,0,0.06)" stroke-width="1.5"/>
+      <!-- sign screws -->
+      <circle cx="122" cy="34" r="3" fill="#B87810"/>
+      <circle cx="238" cy="34" r="3" fill="#B87810"/>
+      <circle cx="122" cy="60" r="3" fill="#B87810"/>
+      <circle cx="238" cy="60" r="3" fill="#B87810"/>
+      <!-- ZOO text -->
+      <text x="180" y="56" font-family="Arial Black, sans-serif" font-weight="900" font-size="26" fill="#5A2A08" text-anchor="middle" letter-spacing="4">ZOO</text>
+      <text x="180" y="56" font-family="Arial Black, sans-serif" font-weight="900" font-size="26" fill="rgba(255,255,255,0.15)" text-anchor="middle" letter-spacing="4" dx="1" dy="-1">ZOO</text>
+
+      <!-- snake on arch -->
+      <path d="M80,62 Q90,50 100,58 Q110,66 120,54" stroke="#2a7a1a" stroke-width="5" fill="none" stroke-linecap="round"/>
+      <circle cx="80" cy="62" r="4" fill="#3a9a2a"/>
+      <!-- tiny animals peeking -->
+      <text x="52" y="100" font-size="18" opacity="0.85">🐒</text>
+      <text x="296" y="105" font-size="16" opacity="0.85">🦜</text>
+    </svg>
+
+    <div class="gate-tap">tap to enter</div>
+  </div>
+
+  <div class="gate-statement">BUKAN UNDANGAN NIKAH</div>
+
+  <!-- grass floor -->
+  <svg class="gate-grass" viewBox="0 0 800 80" preserveAspectRatio="none" style="display:block;">
+    <rect x="0" y="40" width="800" height="40" fill="#2d6a1e"/>
+    <path d="M0,40 C50,28 100,44 150,32 C200,20 250,40 300,28 C350,16 400,38 450,26 C500,14 550,36 600,24 C650,12 700,36 750,28 C780,22 800,32 800,32 L800,80 L0,80 Z" fill="#3a8a2a"/>
+    <path d="M0,52 C40,44 80,56 120,48 C160,40 200,54 240,46 C280,38 320,52 360,44 C400,36 440,52 480,44 C520,36 560,52 600,46 C640,40 680,52 720,46 C760,40 790,50 800,48 L800,80 L0,80 Z" fill="#4a9a2e"/>
+  </svg>
+</div>
+
+<div id="ytPlayer"></div>
+<button class="music-fab" id="musicFab" onclick="toggleMusic()">🎵</button>
+
+<!-- ===================== MAIN ===================== -->
+<div id="main">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-glow"></div>
+    <div class="light-spot" style="width:180px;height:180px;top:14%;left:18%;animation-delay:0s;animation-duration:7s;"></div>
+    <div class="light-spot" style="width:120px;height:120px;top:28%;right:14%;animation-delay:2.5s;animation-duration:9s;"></div>
+
+    <div class="vine" style="left:7%;height:36vh;animation-duration:5s;"></div>
+    <div class="vine" style="left:17%;height:24vh;animation-delay:1.2s;animation-duration:4s;"></div>
+    <div class="vine" style="right:9%;height:30vh;animation-delay:0.6s;animation-duration:6s;"></div>
+    <div class="vine" style="right:20%;height:20vh;animation-delay:2.2s;animation-duration:4.5s;"></div>
+
+    <span class="hero-animal ha-giraffe">🦒</span>
+    <span class="hero-animal ha-elephant">🐘</span>
+    <span class="hero-animal ha-monkey">🐒</span>
+    <span class="hero-animal ha-toucan">🦜</span>
+    <span class="hero-animal ha-tiger">🐯</span>
+    <span class="hero-animal ha-croc">🐊</span>
+
+    <svg class="hero-top-svg" viewBox="0 0 1440 120" preserveAspectRatio="none">
+      <path d="M0,0 L0,85 C22,75 46,50 72,43 C98,36 108,66 134,73 C160,80 178,54 204,46 C230,38 240,70 266,77 C292,84 312,60 338,52 C364,44 374,74 400,80 C426,86 448,62 474,54 C500,46 510,76 536,82 C562,88 580,64 606,57 C632,50 642,78 668,83 C694,88 712,66 738,60 C764,54 774,80 800,85 C826,90 848,68 874,62 C900,56 910,82 936,86 C962,90 982,70 1008,65 C1034,60 1044,84 1070,87 C1096,90 1116,72 1142,68 C1168,64 1178,86 1204,88 C1230,90 1250,74 1276,71 C1302,68 1320,88 1346,90 C1372,92 1400,78 1426,75 L1440,74 L1440,0 Z" fill="#1a3a0e" opacity="0.96"/>
+    </svg>
+
+    <div class="hero-content">
+      <div class="hero-tag">🎪 Birthday Party</div>
+      <div class="hero-names">Erikh<span class="hero-amp">&</span>Vivi</div>
+    </div>
+
+    <svg class="hero-floor" viewBox="0 0 1440 140" preserveAspectRatio="none">
+      <path d="M0,0 L0,72 C24,63 50,42 76,35 C102,28 114,58 140,65 C166,72 186,48 212,40 C238,32 248,64 274,71 C300,78 322,54 348,46 C374,38 384,68 410,75 C436,82 458,58 484,50 C510,42 520,72 546,79 C572,86 592,62 618,55 C644,48 654,76 680,82 C706,88 726,65 752,58 C778,51 788,80 814,86 C840,92 860,68 886,62 C912,56 922,84 948,88 C974,92 994,72 1020,67 C1046,62 1056,88 1082,91 C1108,94 1128,76 1154,71 C1180,66 1190,90 1216,92 C1242,94 1262,78 1288,74 C1314,70 1332,90 1358,92 C1384,94 1410,80 1436,77 L1440,76 L1440,140 L0,140 Z" fill="#1a3a0e" opacity="0.97"/>
+      <path d="M0,140 L0,106 C28,98 54,80 80,76 C106,72 118,90 144,96 C170,102 190,84 216,79 C242,74 252,94 278,100 C304,106 326,88 352,83 C378,78 388,96 414,102 C440,108 462,90 488,86 C514,82 524,100 550,105 C576,110 596,94 622,90 C648,86 658,102 684,107 C710,112 730,97 756,93 C782,89 792,105 818,109 C844,113 864,99 890,96 C916,93 926,108 952,111 C978,114 998,101 1024,98 C1050,95 1060,110 1086,113 C1112,116 1132,104 1158,102 C1184,100 1194,113 1220,115 C1246,117 1266,106 1292,104 C1318,102 1338,114 1364,116 C1390,118 1416,108 1442,106 L1440,106 L1440,140 Z" fill="#0e2208"/>
+    </svg>
+
+    <div class="scroll-hint">↓ scroll ↓</div>
+  </section>
+
+  <!-- wave transition hero → section 1 -->
+  <div id="content-flow">
+
+  <!-- WILDCARDS -->
+  <div class="s1">
+    <div class="sec-wrap reveal">
+      <p class="sec-eyebrow">— Specimen of the Day —</p>
+      <h2 class="sec-title">Meet The Wildcards 🎪</h2>
+      <div class="sec-divider"></div>
+
+      <div class="wildcard-card">
+        <div class="wc-inner">
+          <div class="wc-photo">
+            <div class="wc-badge">Zoo ID #001</div>
+            <div class="gorilla-wrap">
+              <svg class="gorilla-svg" viewBox="0 0 120 130" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="28" cy="42" rx="13" ry="15" fill="#3a2a1a"/>
+                <ellipse cx="92" cy="42" rx="13" ry="15" fill="#3a2a1a"/>
+                <ellipse cx="28" cy="42" rx="7" ry="9" fill="#5a4030"/>
+                <ellipse cx="92" cy="42" rx="7" ry="9" fill="#5a4030"/>
+                <ellipse cx="60" cy="55" rx="42" ry="40" fill="#4a3625"/>
+                <ellipse cx="60" cy="66" rx="30" ry="26" fill="#6b5540"/>
+                <path d="M28,44 Q60,28 92,44" stroke="#3a2a1a" stroke-width="9" fill="none" stroke-linecap="round"/>
+                <ellipse cx="45" cy="52" rx="6" ry="7" fill="#1a1008"/>
+                <ellipse cx="75" cy="52" rx="6" ry="7" fill="#1a1008"/>
+                <circle cx="47" cy="49" r="1.8" fill="#fff"/>
+                <circle cx="77" cy="49" r="1.8" fill="#fff"/>
+                <ellipse cx="60" cy="72" rx="14" ry="10" fill="#2a1c10"/>
+                <ellipse cx="53" cy="70" rx="4" ry="5" fill="#1a100a"/>
+                <ellipse cx="67" cy="70" rx="4" ry="5" fill="#1a100a"/>
+                <path d="M45,86 Q60,96 75,86" stroke="#2a1c10" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <ellipse cx="60" cy="122" rx="38" ry="24" fill="#4a3625"/>
+                <ellipse cx="60" cy="120" rx="26" ry="18" fill="#6b5540"/>
+                <g transform="translate(60,112)">
+                  <path d="M-16,0 L-2,-8 L-2,8 Z" fill="#1a3a0e"/>
+                  <path d="M16,0 L2,-8 L2,8 Z" fill="#1a3a0e"/>
+                  <circle cx="0" cy="0" r="5" fill="#0e2208"/>
+                  <path d="M-16,0 L-2,-8 L-2,8 Z" fill="none" stroke="#2d5a1e" stroke-width="1"/>
+                  <path d="M16,0 L2,-8 L2,8 Z" fill="none" stroke="#2d5a1e" stroke-width="1"/>
+                </g>
+              </svg>
+            </div>
+            <div class="wc-animal">🦁</div>
+          </div>
+          <div class="wc-info">
+            <div class="wc-name">Erikh</div>
+            <div class="wc-fact-row"><span class="wc-fact-icon">🍽️</span><div><span class="wc-fact-label">Makanan Favorit</span><span class="wc-fact-val">1 Loyang Terang Bulan</span></div></div>
+            <div class="wc-fact-row"><span class="wc-fact-icon">🎯</span><div><span class="wc-fact-label">Hobi</span><span class="wc-fact-val">Cari Duit</span></div></div>
+            <div class="wc-fact-row"><span class="wc-fact-icon">😆</span><div><span class="wc-fact-label">Fakta Unik</span><span class="wc-fact-val">Liburan malah sakit kepala</span></div></div>
+            <div class="wc-motto">"Motto hidup Erikh di sini"</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wildcard-card vivi-card">
+        <div class="wc-inner">
+          <div class="wc-photo">
+            <div class="wc-badge">Zoo ID #002</div>
+            <div class="gorilla-wrap">
+              <svg class="gorilla-svg" viewBox="0 0 120 130" xmlns="http://www.w3.org/2000/svg">
+                <ellipse cx="28" cy="42" rx="13" ry="15" fill="#5a3a28"/>
+                <ellipse cx="92" cy="42" rx="13" ry="15" fill="#5a3a28"/>
+                <ellipse cx="28" cy="42" rx="7" ry="9" fill="#7a5a40"/>
+                <ellipse cx="92" cy="42" rx="7" ry="9" fill="#7a5a40"/>
+                <ellipse cx="60" cy="55" rx="42" ry="40" fill="#6b4a34"/>
+                <ellipse cx="60" cy="66" rx="30" ry="26" fill="#8a6a4e"/>
+                <path d="M28,44 Q60,32 92,44" stroke="#5a3a28" stroke-width="7" fill="none" stroke-linecap="round"/>
+                <!-- eyelashes for feminine touch -->
+                <ellipse cx="45" cy="51" rx="6" ry="7" fill="#1a1008"/>
+                <ellipse cx="75" cy="51" rx="6" ry="7" fill="#1a1008"/>
+                <circle cx="47" cy="48" r="1.8" fill="#fff"/>
+                <circle cx="77" cy="48" r="1.8" fill="#fff"/>
+                <path d="M39,46 L36,42 M42,44 L40,39 M46,44 L46,39" stroke="#1a1008" stroke-width="1.4" stroke-linecap="round"/>
+                <path d="M81,46 L84,42 M78,44 L80,39 M74,44 L74,39" stroke="#1a1008" stroke-width="1.4" stroke-linecap="round"/>
+                <ellipse cx="60" cy="72" rx="13" ry="9" fill="#3a2418"/>
+                <ellipse cx="53" cy="70" rx="3.5" ry="4.5" fill="#241608"/>
+                <ellipse cx="67" cy="70" rx="3.5" ry="4.5" fill="#241608"/>
+                <path d="M46,85 Q60,94 74,85" stroke="#3a2418" stroke-width="3" fill="none" stroke-linecap="round"/>
+                <!-- blush -->
+                <ellipse cx="38" cy="68" rx="6" ry="4" fill="#e88a9a" opacity="0.35"/>
+                <ellipse cx="82" cy="68" rx="6" ry="4" fill="#e88a9a" opacity="0.35"/>
+                <ellipse cx="60" cy="122" rx="38" ry="24" fill="#6b4a34"/>
+                <ellipse cx="60" cy="120" rx="26" ry="18" fill="#8a6a4e"/>
+                <!-- PINK BOW on head -->
+                <g transform="translate(60,20)">
+                  <path d="M-16,0 Q-22,-10 -12,-12 Q-4,-10 0,0 Q4,-10 12,-12 Q22,-10 16,0 Q22,10 12,12 Q4,10 0,0 Q-4,10 -12,12 Q-22,10 -16,0 Z" fill="#f472a8"/>
+                  <circle cx="0" cy="0" r="5" fill="#e85a90"/>
+                  <path d="M-16,0 Q-22,-10 -12,-12 Q-4,-10 0,0 Q-4,10 -12,12 Q-22,10 -16,0 Z" fill="none" stroke="#e85a90" stroke-width="1" opacity="0.5"/>
+                </g>
+              </svg>
+            </div>
+            <div class="wc-animal">🦋</div>
+          </div>
+          <div class="wc-info">
+            <div class="wc-name">Vivi</div>
+            <div class="wc-fact-row"><span class="wc-fact-icon">🍜</span><div><span class="wc-fact-label">Makanan Favorit</span><span class="wc-fact-val">Anything Berkuah</span></div></div>
+            <div class="wc-fact-row"><span class="wc-fact-icon">😴</span><div><span class="wc-fact-label">Hobi</span><span class="wc-fact-val">Tidur di Kantor</span></div></div>
+            <div class="wc-fact-row"><span class="wc-fact-icon">😆</span><div><span class="wc-fact-label">Fakta Unik</span><span class="wc-fact-val">Udah ngantuk tapi gamau tidur</span></div></div>
+            <div class="wc-motto">"Motto hidup Vivi di sini"</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- wave s1 → s2 -->
+  <div class="wave-div" style="background:var(--cream);">
+    <svg viewBox="0 0 1440 40" preserveAspectRatio="none" height="40">
+      <path d="M0,40 C360,0 720,40 1080,10 C1260,0 1380,30 1440,20 L1440,0 L0,0 Z" fill="var(--bg-main)"/>
+    </svg>
+  </div>
+
+  <!-- COUNTDOWN -->
+  <div class="s2">
+    <div class="sec-wrap reveal">
+      <p class="sec-eyebrow">— Hitung Mundur —</p>
+      <h2 class="sec-title">Menuju Hari H! 🎊</h2>
+      <div class="sec-divider"></div>
+      <div class="cd-grid">
+        <div class="cd-box"><span class="cd-num" id="days">--</span><span class="cd-lbl">Hari</span></div>
+        <div class="cd-box"><span class="cd-num" id="hours">--</span><span class="cd-lbl">Jam</span></div>
+        <div class="cd-box"><span class="cd-num" id="mins">--</span><span class="cd-lbl">Menit</span></div>
+        <div class="cd-box"><span class="cd-num" id="secs">--</span><span class="cd-lbl">Detik</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- wave s2 → s3 -->
+  <div class="wave-div" style="background:var(--brown5);">
+    <svg viewBox="0 0 1440 40" preserveAspectRatio="none" height="40">
+      <path d="M0,0 C300,40 600,5 900,35 C1100,55 1300,15 1440,25 L1440,40 L0,40 Z" fill="var(--cream)"/>
+    </svg>
+  </div>
+
+  <!-- DETAIL ACARA -->
+  <div class="s3">
+    <div class="sec-wrap reveal">
+      <p class="sec-eyebrow">— Expedition Brief —</p>
+      <h2 class="sec-title">Detail Acara 🗺️</h2>
+      <div class="sec-divider"></div>
+      <div class="details-card">
+        <div class="details-header">
+          <span style="font-size:22px;">🎪</span>
+          <div class="details-h-title">Birthday Bash!</div>
+          <div class="detail-stamp" style="margin-left:auto;">
+            <span class="stamp-mo">AUG</span><span class="stamp-d">09</span><span class="stamp-yr">2026</span>
+          </div>
+        </div>
+        <div class="detail-rows">
+          <div class="detail-row">
+            <div class="detail-icon">📅</div>
+            <div><div class="detail-k">Tanggal</div><div class="detail-v">Minggu, 9 Agustus 2026</div></div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-icon">🕐</div>
+            <div><div class="detail-k">Waktu</div><div class="detail-v">18.30 WIB</div><div class="detail-sub">Jangan telat ya, hewan-hewannya udah nungguin! 👀</div></div>
+          </div>
+          <div class="detail-row">
+            <div class="detail-icon">📍</div>
+            <div><div class="detail-k">Lokasi</div><div class="detail-v">McDonald's Darmo</div><div class="detail-sub">Jl. Raya Darmo No.43, Surabaya</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- wave s3 → s4 -->
+  <div class="wave-div" style="background:var(--bg-alt);">
+    <svg viewBox="0 0 1440 40" preserveAspectRatio="none" height="40">
+      <path d="M0,40 C200,10 500,40 800,20 C1000,5 1250,35 1440,15 L1440,0 L0,0 Z" fill="var(--brown5)"/>
+    </svg>
+  </div>
+
+  <!-- DRESSCODE -->
+  <div class="s4">
+    <div class="sec-wrap reveal">
+      <p class="sec-eyebrow">— Dress For The Wild —</p>
+      <h2 class="sec-title">Dresscode 🌿</h2>
+      <div class="sec-divider"></div>
+      <div class="dc-wrap">
+        <div class="dc-header">
+          <div class="dc-header-title">🎒 Safari Explorer Vibes</div>
+          <div class="dc-header-sub">Casual · Earthy · Adventurous</div>
+        </div>
+        <div class="dc-body">
+          <div class="dc-theme-desc">Bayangkan kamu ranger kebun binatang yang stylish — casual outdoor yang kece, earthy tones, utility vibes. Bukan kostum, tapi tetap terasa petualangan! 🌿</div>
+
+          <div class="dc-palette-section">
+            <div class="dc-palette-label vivi-lbl">🦋 Palette Vivi — Warm Earth</div>
+            <div class="dc-palette-strip">
+              <div class="dc-sw" style="background:#2a0e02;"><span>Espresso</span></div>
+              <div class="dc-sw" style="background:#4a1e06;"><span>Dark Wood</span></div>
+              <div class="dc-sw" style="background:#7a3e18;"><span>Chestnut</span></div>
+              <div class="dc-sw" style="background:#a06030;"><span>Caramel</span></div>
+              <div class="dc-sw" style="background:#c48a50;"><span>Tan</span></div>
+              <div class="dc-sw" style="background:#ddb888;"><span>Sand</span></div>
+              <div class="dc-sw" style="background:#f0ddb8;"><span>Cream</span></div>
+            </div>
+          </div>
+
+          <div class="dc-palette-section">
+            <div class="dc-palette-label erikh-lbl">🦁 Palette Erikh — Forest Green</div>
+            <div class="dc-palette-strip">
+              <div class="dc-sw" style="background:#061a06;"><span>Night</span></div>
+              <div class="dc-sw" style="background:#0e2e0e;"><span>Deep Forest</span></div>
+              <div class="dc-sw" style="background:#1a5a1a;"><span>Hunter</span></div>
+              <div class="dc-sw" style="background:#2d7a2d;"><span>Forest</span></div>
+              <div class="dc-sw" style="background:#4a9a4a;"><span>Fern</span></div>
+              <div class="dc-sw" style="background:#6ab86a;"><span>Sage</span></div>
+              <div class="dc-sw" style="background:#9ad89a;"><span>Mint</span></div>
+            </div>
+          </div>
+
+          <div class="dc-split">
+            <div class="dc-who-card vivi-who">
+              <div class="dc-who-name">🦋 Tamu Vivi</div>
+              <div class="dc-dots">
+                <div class="dc-dot" style="background:#2a0e02"></div>
+                <div class="dc-dot" style="background:#7a3e18"></div>
+                <div class="dc-dot" style="background:#c48a50"></div>
+                <div class="dc-dot" style="background:#f0ddb8"></div>
+              </div>
+              <div class="dc-who-desc">Brown gelap ke krem hangat<br>Earthy · Warm · Savana vibes</div>
+            </div>
+            <div class="dc-who-card erikh-who">
+              <div class="dc-who-name">🦁 Tamu Erikh</div>
+              <div class="dc-dots">
+                <div class="dc-dot" style="background:#061a06"></div>
+                <div class="dc-dot" style="background:#1a5a1a"></div>
+                <div class="dc-dot" style="background:#4a9a4a"></div>
+                <div class="dc-dot" style="background:#9ad89a"></div>
+              </div>
+              <div class="dc-who-desc">Hijau tua ke hijau muda<br>Fresh · Cool · Forest vibes</div>
+            </div>
+          </div>
+          <div class="dc-note">* Bebas mix! Yang penting dateng dengan semangat ekspedisi 🎒🌿</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- wave s4 → s1 -->
+  <div class="wave-div" style="background:var(--bg-main);">
+    <svg viewBox="0 0 1440 40" preserveAspectRatio="none" height="40">
+      <path d="M0,0 C360,40 720,5 1080,35 C1260,50 1380,20 1440,30 L1440,40 L0,40 Z" fill="var(--bg-alt)"/>
+    </svg>
+  </div>
+
+  <!-- KESAN PESAN -->
+  <div class="s1">
+    <div class="sec-wrap reveal">
+      <p class="sec-eyebrow">— Tinggalkan Jejakmu —</p>
+      <h2 class="sec-title">Pesan untuk Mereka 💌</h2>
+      <div class="sec-divider"></div>
+      <div class="kesan-card">
+        <p style="font-family:'Poppins',sans-serif;font-size:12px;color:#999;margin-bottom:20px;line-height:1.8;">Tulis doa & harapanmu untuk yang ultah. Tampil anonim & bisa dibaca semua orang! 🌳</p>
+        <div class="form-grp">
+          <label class="form-lbl">Pesanmu untuk...</label>
+          <div class="for-grid">
+            <button class="for-btn lion" id="forErikh" onclick="selectFor('Erikh')">🦁 Erikh</button>
+            <button class="for-btn butterfly" id="forVivi" onclick="selectFor('Vivi')">🦋 Vivi</button>
+          </div>
+        </div>
+        <div class="form-grp">
+          <label class="form-lbl">Pesanmu</label>
+          <textarea class="form-inp" id="kesanMsg" rows="4" placeholder="Tulis harapan & doa terbaikmu..." style="resize:none;"></textarea>
+        </div>
+        <button class="send-btn" id="kesanBtn" onclick="submitKesan()">Kirim ke Pohon Harapan 🌳</button>
+        <div class="ok-box" id="kesanOk">Yeay! Pesanmu sudah menempel di pohon! 🍃</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- wave s1 → s2 -->
+  <div class="wave-div" style="background:var(--cream);">
+    <svg viewBox="0 0 1440 40" preserveAspectRatio="none" height="40">
+      <path d="M0,40 C240,0 560,40 880,15 C1100,0 1300,30 1440,20 L1440,0 L0,0 Z" fill="var(--bg-main)"/>
+    </svg>
+  </div>
+
+  <!-- WALL -->
+  <div class="s2">
+    <div class="sec-wrap reveal">
+      <p class="sec-eyebrow">— Pohon Harapan —</p>
+      <h2 class="sec-title">Doa dari Kalian 🌳</h2>
+      <div class="sec-divider"></div>
+      <div class="msg-grid" id="wallGrid">
+        <div class="msg-empty">Pohon harapannya masih kosong...<br>Jadilah daun pertama! 🍃</div>
+      </div>
+      <button class="refresh-btn" onclick="loadMessages()">↻ refresh pesan</button>
+    </div>
+  </div>
+
+  <!-- wave s2 → s3 -->
+  <div class="wave-div" style="background:var(--brown5);">
+    <svg viewBox="0 0 1440 40" preserveAspectRatio="none" height="40">
+      <path d="M0,0 C400,40 800,0 1200,30 C1350,45 1420,20 1440,25 L1440,40 L0,40 Z" fill="var(--cream)"/>
+    </svg>
+  </div>
+
+  <!-- RSVP -->
+  <div class="s3">
+    <div class="sec-wrap reveal">
+      <p class="sec-eyebrow">— Konfirmasi Kehadiran —</p>
+      <h2 class="sec-title">Tiket Masuk 🎟️</h2>
+      <div class="sec-divider"></div>
+      <div class="ticket">
+        <div class="ticket-top">
+          <div>
+            <div class="ticket-admit">— Admit One —</div>
+            <div class="ticket-title">Birthday Bash!</div>
+            <div style="font-size:10px;color:rgba(168,220,120,0.7);margin-top:4px;font-family:'Poppins',sans-serif;font-weight:600;letter-spacing:2px;">9 AGUSTUS 2026</div>
+          </div>
+          <div class="ticket-right">🎪</div>
+        </div>
+        <div class="perf"><div class="perf-hole"></div><div class="perf-dash"></div><div class="perf-hole"></div></div>
+        <div class="ticket-body">
+          <p class="ticket-note">Konfirmasi sebelum <strong style="color:var(--g2);">2 Agustus 2026</strong> ya — biar kita bisa prepare semuanya buat kamu! 🍟</p>
+          <div class="t-grp">
+            <label class="t-lbl">Nama Kamu</label>
+            <input type="text" class="t-inp" id="rsvpName" placeholder="Tulis nama kamu...">
+          </div>
+          <div class="t-grp">
+            <label class="t-lbl">Hadir?</label>
+            <div class="attend-btns">
+              <button class="att-btn yes" id="btnYes" onclick="selectAttend('yes')">✓ Hadir</button>
+              <button class="att-btn no" id="btnNo" onclick="selectAttend('no')">✕ Berhalangan</button>
+            </div>
+          </div>
+          <button class="t-submit" id="rsvpBtn" onclick="submitRSVP()">Cetak Tiket 🎟️</button>
+          <div class="t-ok" id="rsvpOk">Yeay! Tiketmu udah tercatat! Sampai ketemu 🦁</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  </div><!-- /content-flow -->
+
+  <footer class="footer">
+    <div class="footer-animals">🦁 🦒 🐘 🦋 🐒 🦜</div>
+    <div class="footer-title">Erikh & Vivi</div>
+    <div class="footer-sub">9 Agustus 2026 · Surabaya · (bukan undangan nikah 😄)</div>
+  </footer>
+
+</div><!-- /main -->
+
+<script>
+const SCRIPT_URL='PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+let attendStatus=null,forWhom=null,ytReady=false,playerObj=null,isPlaying=false,gateOpened=false;
+
+// ---- LOADING SCREEN ----
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    const loader=document.getElementById('loader');
+    loader.classList.add('done');
+    setTimeout(()=>{
+      loader.style.display='none';
+      const splash=document.getElementById('splash');
+      splash.classList.add('show');
+    },650);
+  },2200);
+});
+
+// ---- GATE OPEN ----
+function openGate(){
+  if(gateOpened)return;gateOpened=true;
+  document.getElementById('doorL').classList.add('open');
+  document.getElementById('doorR').classList.add('open');
+  setTimeout(()=>{
+    document.getElementById('splash').classList.add('out');
+    const main=document.getElementById('main');main.style.display='block';
+    setTimeout(()=>{
+      main.classList.add('visible');
+      document.getElementById('musicFab').classList.add('show');
+      initReveal();startCountdown();loadMessages();
+      setTimeout(tryPlay,800);
+    },100);
+  },900);
+}
+
+// ---- YOUTUBE ----
+function onYouTubeIframeAPIReady(){
+  playerObj=new YT.Player('ytPlayer',{height:'0',width:'0',videoId:'mLqSBvS4t0w',playerVars:{autoplay:0,loop:1,playlist:'mLqSBvS4t0w'},events:{onReady:()=>{ytReady=true;},onStateChange:(e)=>{isPlaying=e.data===YT.PlayerState.PLAYING;document.getElementById('musicFab').textContent=isPlaying?'⏸':'🎵';}}});
+}
+function tryPlay(){if(ytReady&&playerObj)playerObj.playVideo();else setTimeout(tryPlay,500);}
+function toggleMusic(){if(!playerObj)return;isPlaying?playerObj.pauseVideo():playerObj.playVideo();}
+var t=document.createElement('script');t.src='https://www.youtube.com/iframe_api';document.head.appendChild(t);
+
+// ---- COUNTDOWN ----
+function startCountdown(){
+  const tgt=new Date('2026-08-09T12:00:00').getTime();
+  function upd(){
+    const d=tgt-Date.now();
+    if(d<=0){document.getElementById('secs').textContent='🎉';return;}
+    document.getElementById('days').textContent=String(Math.floor(d/86400000)).padStart(2,'0');
+    document.getElementById('hours').textContent=String(Math.floor((d%86400000)/3600000)).padStart(2,'0');
+    document.getElementById('mins').textContent=String(Math.floor((d%3600000)/60000)).padStart(2,'0');
+    document.getElementById('secs').textContent=String(Math.floor((d%60000)/1000)).padStart(2,'0');
+  }
+  upd();setInterval(upd,1000);
+}
+
+// ---- SCROLL REVEAL ----
+function initReveal(){
+  const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('in');}),{threshold:0.08});
+  document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+}
+
+// ---- RSVP ----
+function selectAttend(v){
+  attendStatus=v;
+  document.getElementById('btnYes').classList.toggle('active',v==='yes');
+  document.getElementById('btnNo').classList.toggle('active',v==='no');
+}
+async function submitRSVP(){
+  const name=document.getElementById('rsvpName').value.trim();
+  if(!name)return alert('Tulis namamu dulu!');
+  if(!attendStatus)return alert('Pilih hadir atau tidak dulu!');
+  const btn=document.getElementById('rsvpBtn');btn.disabled=true;btn.textContent='Memproses...';
+  try{
+    if(SCRIPT_URL!=='PASTE_YOUR_APPS_SCRIPT_URL_HERE')await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'rsvp',name,status:attendStatus,time:new Date().toLocaleString('id-ID')})});
+    else await new Promise(r=>setTimeout(r,700));
+    document.getElementById('rsvpOk').style.display='block';btn.style.display='none';
+  }catch(e){btn.disabled=false;btn.textContent='Cetak Tiket 🎟️';alert('Gagal, coba lagi!');}
+}
+
+// ---- KESAN ----
+function selectFor(w){
+  forWhom=w;
+  document.getElementById('forErikh').classList.toggle('active',w==='Erikh');
+  document.getElementById('forVivi').classList.toggle('active',w==='Vivi');
+}
+async function submitKesan(){
+  const msg=document.getElementById('kesanMsg').value.trim();
+  if(!forWhom)return alert('Pilih dulu untuk siapa!');
+  if(!msg)return alert('Tulis pesanmu dulu!');
+  const btn=document.getElementById('kesanBtn');btn.disabled=true;btn.textContent='Mengirim...';
+  try{
+    if(SCRIPT_URL!=='PASTE_YOUR_APPS_SCRIPT_URL_HERE')await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify({type:'kesan',for:forWhom,message:msg,time:new Date().toLocaleString('id-ID')})});
+    else await new Promise(r=>setTimeout(r,700));
+    addToWall(forWhom,msg);
+    document.getElementById('kesanOk').style.display='block';
+    document.getElementById('kesanMsg').value='';forWhom=null;
+    document.getElementById('forErikh').classList.remove('active');
+    document.getElementById('forVivi').classList.remove('active');
+    btn.disabled=false;btn.textContent='Kirim ke Pohon Harapan 🌳';
+  }catch(e){btn.disabled=false;btn.textContent='Kirim ke Pohon Harapan 🌳';alert('Gagal!');}
+}
+function addToWall(who,text){
+  const wall=document.getElementById('wallGrid');
+  const empty=wall.querySelector('.msg-empty');if(empty)empty.remove();
+  const b=document.createElement('div');b.className=`msg-leaf for-${who.toLowerCase()}`;
+  b.innerHTML=`<div class="msg-tag">${who==='Erikh'?'🦁':'🦋'} untuk ${who}</div><div class="msg-txt">"${text}"</div><div class="msg-time">baru saja</div>`;
+  wall.insertBefore(b,wall.firstChild);
+}
+async function loadMessages(){
+  if(SCRIPT_URL==='PASTE_YOUR_APPS_SCRIPT_URL_HERE')return;
+  try{
+    const res=await fetch(SCRIPT_URL+'?type=getMessages');const data=await res.json();
+    if(data?.messages?.length){
+      const wall=document.getElementById('wallGrid');wall.innerHTML='';
+      data.messages.forEach(m=>{
+        const b=document.createElement('div');b.className=`msg-leaf for-${(m.for||'').toLowerCase()}`;
+        b.innerHTML=`<div class="msg-tag">${m.for==='Erikh'?'🦁':'🦋'} untuk ${m.for}</div><div class="msg-txt">"${m.message}"</div><div class="msg-time">${m.time}</div>`;
+        wall.appendChild(b);
+      });
+    }
+  }catch(e){}
+}
+</script>
+</body>
+</html>
